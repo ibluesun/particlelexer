@@ -1,0 +1,85 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParticleLexer", "ParticleLexer\ParticleLexer.csproj", "{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParticleLexerUnitTest", "ParticleLexerUnitTest\ParticleLexerUnitTest.csproj", "{92399738-49AE-4434-BDB7-6C6A73AB1F8D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FC873EC5-2951-4FB8-892F-DE596E0F3053}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		ParticleLexer.vsmdi = ParticleLexer.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTestProjects", "UnitTestProjects", "{81AAD13E-1580-46A2-883D-F7BE8646E368}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParticleLexerViewer", "ParticleLexerViewer\ParticleLexerViewer.csproj", "{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs01.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ParticleLexer\\ParticleLexer.csproj
+		SccProjectName1 = ParticleLexer
+		SccLocalPath1 = ParticleLexer
+		SccProjectUniqueName2 = ParticleLexerUnitTest\\ParticleLexerUnitTest.csproj
+		SccProjectTopLevelParentUniqueName2 = ParticleLexer.sln
+		SccProjectName2 = ParticleLexerUnitTest
+		SccLocalPath2 = ParticleLexerUnitTest
+		SccProjectUniqueName3 = ParticleLexerViewer\\ParticleLexerViewer.csproj
+		SccProjectName3 = ParticleLexerViewer
+		SccLocalPath3 = ParticleLexerViewer
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = ParticleLexer.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E43BCD41-3C05-4B66-A927-2E8CC9729C5E}.Release|x86.ActiveCfg = Release|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D}.Release|x86.ActiveCfg = Release|Any CPU
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Debug|x86.ActiveCfg = Debug|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Debug|x86.Build.0 = Debug|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Release|Any CPU.ActiveCfg = Release|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Release|Mixed Platforms.Build.0 = Release|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Release|x86.ActiveCfg = Release|x86
+		{6648D012-6A30-4DDF-98C3-F8E6D3A8FEFD}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{92399738-49AE-4434-BDB7-6C6A73AB1F8D} = {81AAD13E-1580-46A2-883D-F7BE8646E368}
+	EndGlobalSection
+EndGlobal
