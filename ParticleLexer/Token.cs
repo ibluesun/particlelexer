@@ -378,7 +378,7 @@ namespace ParticleLexer
         /// Merge Single Tokens into one token guided by regular expression.        
         /// </summary>
         /// <returns></returns>
-        public  Token MergeTokens(TokenClass tokenClassType)
+        private  Token MergeTokens(TokenClass tokenClassType)
         {
             
             Regex rx = tokenClassType.Regex;
@@ -507,6 +507,9 @@ namespace ParticleLexer
             return Zabbat(current);
         }
 
+
+        private static Dictionary<Type, TokenClass> CachedTokenClasses = new Dictionary<Type, TokenClass>();
+
         /// <summary>
         /// Merge tokens based on token class.
         /// </summary>
@@ -514,8 +517,16 @@ namespace ParticleLexer
         /// <returns></returns>
         public Token MergeTokens<DesiredTokenClass>() where DesiredTokenClass: TokenClass, new()
         {
-            ParticleLexer.TokenClass instance = new DesiredTokenClass();
+            TokenClass instance;
+            CachedTokenClasses.TryGetValue(typeof(DesiredTokenClass), out instance);
+            if (instance == null)
+            {
+                instance = new DesiredTokenClass();
+                CachedTokenClasses.Add(typeof(DesiredTokenClass), instance);
+            }
+
             return MergeTokens(instance);
+
         }
 
 
