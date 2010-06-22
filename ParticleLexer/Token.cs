@@ -380,14 +380,11 @@ namespace ParticleLexer
         /// <returns></returns>
         private  Token MergeTokens(TokenClass tokenClassType)
         {
-            
             Regex rx = tokenClassType.Regex;
-
             Token current = new Token();
-
             Token merged = new Token();
-
             int tokIndex = 0;
+
             while (tokIndex < childTokens.Count)
             {
             loopHead:
@@ -396,10 +393,8 @@ namespace ParticleLexer
                 if (rx.Match(merged.TokenValue + tok.TokenValue).Success)
                 {
                     //continue merge until merged value fail then last merged value is the desired value.
-
                     merged.AppendSubToken(tok);
-                    
-                    merged.TokenClassType = tokenClassType.GetType();
+                    merged.TokenClassType = tokenClassType.Type;
                 }
                 else
                 {
@@ -410,55 +405,71 @@ namespace ParticleLexer
                     //     I will make dirty solution to try
                     //      consume rest of tokens until found a success or end the discussion (end of tokens) :)
                     //
-                    //   The behaviour above now is modified when marked the token class as ExactWord
+                    //   The behavior above now is modified when marked the token class as ExactWord
 
                     if (!string.IsNullOrEmpty(merged.TokenValue) && tokenClassType.Type != typeof(WordToken) )
                     {                   
                         // inner sneaky loop. :)
                         int rtokIndex = tokIndex;
-                        string emval = merged.TokenValue;
+                        string AccumulatedInnerText = merged.TokenValue;
 
                         while (rtokIndex < childTokens.Count)
                         {
-                            emval += childTokens[rtokIndex].TokenValue;
+                            AccumulatedInnerText += childTokens[rtokIndex].TokenValue;
 
                             //however if the token is marked in tokenclass as ExactWord
                             //  then comparing more characters than actual ones is useless 
                             //  and will result un-needed cycles.
                             if (tokenClassType.ExactWord)
                             {
-                                if (emval.Length > tokenClassType.RegexPattern.Length)
+                                // two checks because of exact word flag
+
+                                // first check: is the length of accumlated
+                                if (AccumulatedInnerText.Length > tokenClassType.OriginalPatternWord.Length)
                                 {
-                                    // no need to compare extra charachters
-                                    // so BREAAAAAAAAAAK
-                                    break;
+                                    // no need to compare extra charachters ... so BREAAAAAAAAAAK
+                                    goto WhileBreak;
+                                }
+                                
+                                // second check: check letter by letter that they are identical
+                                for (int iai = 0; iai < AccumulatedInnerText.Length; iai++)
+                                    if (AccumulatedInnerText[iai] != tokenClassType.OriginalPatternWord[iai]) goto WhileBreak;
+                            }
+                            else
+                            {
+                                // pattern is not word token however we can test if the consumed charachters are in the pattern
+                                if (!string.IsNullOrEmpty(tokenClassType.ShouldBeginWith))
+                                {
+                                    // test that the accumulated text begins with the token beginwith value.
+                                    // otherwise no need to make other accumulation.
+                                    if (!AccumulatedInnerText.StartsWith(tokenClassType.ShouldBeginWith)) goto WhileBreak;
                                 }
                             }
-                            
 
                             // go with comparing.
-                            if (rx.IsMatch(emval))
+                            if (rx.IsMatch(AccumulatedInnerText))
                             {
-                                //yaaaaahoooo
-
                                 //  after we run over tokens for unknown steps we found a success
-
                                 // merge all tokens that made the success
-
                                 // alter the original loop index and go to the loop tail
+                                for (; tokIndex <= rtokIndex; tokIndex++) merged.AppendSubToken(childTokens[tokIndex]);
 
-                                for (; tokIndex <= rtokIndex; tokIndex++)
-                                {
-                                    merged.AppendSubToken(childTokens[tokIndex]);
-                                }
 
                                 if (tokIndex < childTokens.Count)
                                 {
-                                    // there is another tokens to be tested.
+                                    if (tokenClassType.ContinueTestAfterSuccess)
+                                    {
+                                        goto loopHead;
+                                    }
+                                    else
+                                    {
+                                        // store the discovered token and continue after the last token
+                                        merged.TokenClassType = tokenClassType.Type;
+                                        current.AppendSubToken(merged);
+                                        merged = new Token();
 
-                                    goto loopHead;
-                                    
-                                    //goto continueMerging;
+                                        goto loopHead;
+                                    }
                                 }
                                 else
                                 {
@@ -467,6 +478,9 @@ namespace ParticleLexer
                             }
                             rtokIndex++;
                         }
+
+                    WhileBreak: ;
+                        
                     }
 
 
@@ -474,7 +488,7 @@ namespace ParticleLexer
                     //  continue to test the last token with next tokens to the same regex
                     if (!string.IsNullOrEmpty(merged.TokenValue))
                     {
-                        if (rx.IsMatch(merged.TokenValue)) merged.TokenClassType = tokenClassType.GetType();
+                        if (rx.IsMatch(merged.TokenValue)) merged.TokenClassType = tokenClassType.Type;
                         current.AppendSubToken(merged);
                         merged = new Token();
 
@@ -654,7 +668,6 @@ namespace ParticleLexer
 
                 //make sure all chars in value are white spaces
 
-                //if (tok.TokenValue.ToCharArray().Count(w => char.IsWhiteSpace(w)) == tok.TokenValue.Length)
                 if (tokenTypes.Count(f => f == tok.TokenClassType) > 0)
                 {
                     //all string are white spaces

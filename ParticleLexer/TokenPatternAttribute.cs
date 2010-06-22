@@ -17,6 +17,15 @@ namespace ParticleLexer
         public bool ExactWord { get; set; }
 
 
+        /// <summary>
+        /// Condition for the comparing process to make sure that the target should begin with this value. otherwise the code will bypass the current process.
+        /// </summary>
+        public string ShouldBeginWith { get; set; }
 
+        /// <summary>
+        /// Indicates if parser should continue test after success and consume other tokens or not.
+        /// This property by default is false.
+        /// </summary>
+        public bool ContinueTestAfterSuccess { get; set; }
     }
 }
