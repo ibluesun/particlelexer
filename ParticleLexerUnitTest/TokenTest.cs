@@ -140,5 +140,20 @@ namespace ParticleLexerUnitTest
             Assert.AreEqual(typeof(TripleToken), r[4].TokenClassType);
 
         }
+
+        [TestMethod]
+        public void TestParsingUnits()
+        {
+
+            string line = "Ahmed ..>  90<L> + 50<g> / 300<J/k> * 99<R/H>; # and please don't hestiate any more";
+
+            Token l = Token.ParseText(line);
+
+            l = l.MergeTokens<WordToken>();
+            l = l.MergeTokens<AhmedToken>();
+            l = l.MergeTokens<UnitToken>();
+            l = l.MergeTokens<PositiveSequenceToken>();
+
+        }
     }
 }

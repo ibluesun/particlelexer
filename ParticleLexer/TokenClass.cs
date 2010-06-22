@@ -35,10 +35,37 @@ namespace ParticleLexer
             private set;
         }
 
+        public string OriginalPatternWord
+        {
+            get
+            {
+                return Regex.Unescape(RegexPattern);
+            }
+        }
+
+        /// <summary>
+        /// Condition for the comparing process to make sure that the target should begin with this value. otherwise the code will bypass the current process.
+        /// </summary>
+        public string ShouldBeginWith { get; private set; }
+
+        private bool _ContinueTestAfterSuccess = false;
+
+        /// <summary>
+        /// Indicates if parser should continue test after success and consume other tokens or not.
+        /// This property by default is false.
+        /// </summary>
+        public bool ContinueTestAfterSuccess
+        {
+            get { return _ContinueTestAfterSuccess; }
+            set { _ContinueTestAfterSuccess = value; }
+        }
+
         //cache token regexes
         static Dictionary<Type, Regex> regexes = new Dictionary<Type, Regex>();
         static Dictionary<Type, bool> exactwords = new Dictionary<Type, bool>();
         static Dictionary<Type, string> words = new Dictionary<Type, string>();
+        static Dictionary<Type, string> ShouldBeginingWithList = new Dictionary<Type, string>();
+        static Dictionary<Type, bool> ContinueAfterSuccessList = new Dictionary<Type, bool>();
 
         /*
          * worth mentioned note that when I cached the regexes in this part the console calculations went very fast
@@ -61,6 +88,11 @@ namespace ParticleLexer
                 ExactWord = exactwords[_ThisTokenType];
 
                 RegexPattern = words[_ThisTokenType];
+
+                ShouldBeginWith = ShouldBeginingWithList[_ThisTokenType];
+
+                ContinueTestAfterSuccess = ContinueAfterSuccessList[_ThisTokenType];
+
             }
             else
             {
@@ -77,11 +109,15 @@ namespace ParticleLexer
                         Regex = new Regex("^" + TPA.RegexPattern + "$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         ExactWord = TPA.ExactWord;
                         RegexPattern = TPA.RegexPattern;
+                        ShouldBeginWith = TPA.ShouldBeginWith;
+                        ContinueTestAfterSuccess = TPA.ContinueTestAfterSuccess;
                     }
 
                     regexes.Add(_ThisTokenType, Regex);
                     exactwords.Add(_ThisTokenType, ExactWord);
                     words.Add(_ThisTokenType, RegexPattern);
+                    ShouldBeginingWithList.Add(_ThisTokenType, ShouldBeginWith);
+                    ContinueAfterSuccessList.Add(_ThisTokenType, ContinueTestAfterSuccess);
                 }
             }
         }
