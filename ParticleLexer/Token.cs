@@ -442,7 +442,7 @@ namespace ParticleLexer
                                 {
                                     // test that the accumulated text begins with the token beginwith value.
                                     // otherwise no need to make other accumulation.
-                                    if (!AccumulatedInnerText.StartsWith(tokenClassType.ShouldBeginWith)) goto WhileBreak;
+                                    if (!AccumulatedInnerText.StartsWith(tokenClassType.ShouldBeginWith, StringComparison.OrdinalIgnoreCase)) goto WhileBreak;
                                 }
                             }
 
