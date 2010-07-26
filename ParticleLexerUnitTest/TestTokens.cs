@@ -56,4 +56,9 @@ namespace ParticleLexerUnitTest
     {
     }
 
+    [TokenPattern(RegexPattern = "When", ExactWord = true)]
+    public class WhenToken : TokenClass
+    {
+    }
+
 }

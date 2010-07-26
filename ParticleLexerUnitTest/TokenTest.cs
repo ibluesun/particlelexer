@@ -155,5 +155,20 @@ namespace ParticleLexerUnitTest
             l = l.MergeTokens<PositiveSequenceToken>();
 
         }
+
+        /// <summary>
+        ///A test for MergeMultipleWordTokens
+        ///</summary>
+        [TestMethod()]
+        public void MergeMultipleWordTokensTest()
+        {
+            Token tense = Token.ParseText("Hello There And How Are you today or Ahmed ..> can make something strange ..>");
+            var o = tense.MergeTokens<WordToken>();
+            o = o.MergeMultipleWordTokens(typeof(AhmedToken), typeof(AndWordToken), 
+                typeof(PositiveSequenceToken), typeof(OrWordToken));
+
+
+
+        }
     }
 }

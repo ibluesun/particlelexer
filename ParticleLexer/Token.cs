@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 
 using System.Diagnostics;
 using ParticleLexer.StandardTokens;
+using System.Diagnostics.Contracts;
+using System.Globalization;
 
 namespace ParticleLexer
 {
@@ -522,14 +524,106 @@ namespace ParticleLexer
         }
 
 
+        /// <summary>
+        /// Merge multiple exact words in the same time to enhance performance.
+        /// </summary>
+        /// <param name="tokenClasses"></param>
+        /// <returns></returns>
+        public Token MergeMultipleWordTokens(params Type[] tokenClassesTypes)
+        {
+            Contract.Requires(tokenClassesTypes != null);
+            Contract.Requires(tokenClassesTypes.Length > 0);
+            List<TokenClass> tokenClasses = new List<TokenClass>(tokenClassesTypes.Length);
+            foreach(var tt in tokenClassesTypes)
+            {
+                var tc = GetTokenClass(tt);
+                if (tc.ExactWord==false) throw new InvalidOperationException("Only exact word tokens are allowed");
+                tokenClasses.Add(tc);
+            };
+
+            // the required tokens are exact words that have a definite start and a definite end.
+            Token current = new Token();
+            Token merged = new Token();
+            int tokIndex = 0;
+
+            int TokenClassesIndex = 0;
+            TokenClass CurrentTokenClass = tokenClasses[TokenClassesIndex]; //the token that will be compared with.
+
+            while (tokIndex < childTokens.Count)
+            {            
+                Token tok = childTokens[tokIndex];
+
+                while(TokenClassesIndex < tokenClasses.Count)
+                {
+                    CurrentTokenClass = tokenClasses[TokenClassesIndex];
+                    int subTokIndex = tokIndex;
+                    // the token in test should be less than the compare token.
+                    if(CurrentTokenClass.OriginalPatternWord.StartsWith(tok.TokenValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        
+                        while(subTokIndex < ChildTokens.Count)
+                        {
+                            Token stok = childTokens[subTokIndex];
+                            merged.AppendSubToken(stok);
+
+
+                            if (CurrentTokenClass.OriginalPatternWord.StartsWith(merged.TokenValue, StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (merged.TokenValue.Length == CurrentTokenClass.OriginalPatternWord.Length)
+                                {
+                                    // comparison is right and done.
+                                    merged.TokenClassType = CurrentTokenClass.Type;
+                                    current.AppendSubToken(merged);
+                                    tokIndex = subTokIndex;
+                                    goto loopTail;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                            subTokIndex++;
+                        }
+                    }
+                    
+                    // condition failed either because the token value is greater than the compare or simple is not begining with this token
+                    //  or we didn't get this token either.
+                    // so we go for another tokenclass to compare
+
+                    if (merged.Count > 0) merged = new Token(); //reset the merged object because it was modified
+                    TokenClassesIndex++;
+                    
+                }
+
+                // we didn't find any match that this token can be merged into it
+                // so end up putting it as it is.
+                current.AppendSubToken(tok);
+
+            loopTail:
+                tokIndex++;
+                TokenClassesIndex = 0;
+            }
+                
+            current.TokenClassType = this.TokenClassType;
+            return Zabbat(current);
+        }
+
+
         private static Dictionary<Type, TokenClass> CachedTokenClasses = new Dictionary<Type, TokenClass>();
 
-        /// <summary>
-        /// Merge tokens based on token class.
-        /// </summary>
-        /// <typeparam name="DesiredTokenClass">Token Class Type like <see cref="WordToken"/></typeparam>
-        /// <returns></returns>
-        public Token MergeTokens<DesiredTokenClass>() where DesiredTokenClass: TokenClass, new()
+        public TokenClass GetTokenClass(Type tokenClassType)
+        {
+            TokenClass instance;
+            CachedTokenClasses.TryGetValue(tokenClassType, out instance);
+            if (instance == null)
+            {
+                instance = (TokenClass)Activator.CreateInstance(tokenClassType);
+                CachedTokenClasses.Add(tokenClassType, instance);
+            }
+            return instance;
+        }
+
+        public TokenClass GetTokenClass<DesiredTokenClass>() where DesiredTokenClass : TokenClass, new()
         {
             TokenClass instance;
             CachedTokenClasses.TryGetValue(typeof(DesiredTokenClass), out instance);
@@ -538,9 +632,17 @@ namespace ParticleLexer
                 instance = new DesiredTokenClass();
                 CachedTokenClasses.Add(typeof(DesiredTokenClass), instance);
             }
+            return instance;
+        }
 
-            return MergeTokens(instance);
-
+        /// <summary>
+        /// Merge tokens based on token class.
+        /// </summary>
+        /// <typeparam name="DesiredTokenClass">Token Class Type like <see cref="WordToken"/></typeparam>
+        /// <returns></returns>
+        public Token MergeTokens<DesiredTokenClass>() where DesiredTokenClass: TokenClass, new()
+        {
+            return MergeTokens(GetTokenClass<DesiredTokenClass>());
         }
 
 
