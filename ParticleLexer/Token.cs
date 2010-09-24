@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-
 using System.Diagnostics;
 using ParticleLexer.StandardTokens;
-using System.Diagnostics.Contracts;
 using System.Globalization;
+
+#if NET35
+#else
+using System.Diagnostics.Contracts;
+#endif
 
 namespace ParticleLexer
 {
@@ -531,8 +534,14 @@ namespace ParticleLexer
         /// <returns></returns>
         public Token MergeMultipleWordTokens(params Type[] tokenClassesTypes)
         {
+            #if NET35
+            if (tokenClassesTypes == null) throw new ArgumentException("Null parameters");
+            if (tokenClassesTypes.Length < 1) throw new ArgumentException("No parameter passed");
+            #else
             Contract.Requires(tokenClassesTypes != null);
             Contract.Requires(tokenClassesTypes.Length > 0);
+            #endif
+
             List<TokenClass> tokenClasses = new List<TokenClass>(tokenClassesTypes.Length);
             foreach(var tt in tokenClassesTypes)
             {
