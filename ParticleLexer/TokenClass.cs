@@ -60,12 +60,19 @@ namespace ParticleLexer
             set { _ContinueTestAfterSuccess = value; }
         }
 
+        public bool ContinousToken { get; set; }
+
+        public string ShouldEndWith { get; private set; }
+
+
         //cache token regexes
         static Dictionary<Type, Regex> regexes = new Dictionary<Type, Regex>();
         static Dictionary<Type, bool> exactwords = new Dictionary<Type, bool>();
         static Dictionary<Type, string> words = new Dictionary<Type, string>();
         static Dictionary<Type, string> ShouldBeginingWithList = new Dictionary<Type, string>();
         static Dictionary<Type, bool> ContinueAfterSuccessList = new Dictionary<Type, bool>();
+        static Dictionary<Type, bool> ContinousTokenList = new Dictionary<Type, bool>();
+        static Dictionary<Type, string> ShouldEndWithList = new Dictionary<Type, string>();
 
         /*
          * worth mentioned note that when I cached the regexes in this part the console calculations went very fast
@@ -93,6 +100,10 @@ namespace ParticleLexer
 
                 ContinueTestAfterSuccess = ContinueAfterSuccessList[_ThisTokenType];
 
+                ContinousToken = ContinousTokenList[_ThisTokenType];
+
+                ShouldEndWith = ShouldEndWithList[_ThisTokenType];
+
             }
             else
             {
@@ -111,6 +122,8 @@ namespace ParticleLexer
                         RegexPattern = TPA.RegexPattern;
                         ShouldBeginWith = TPA.ShouldBeginWith;
                         ContinueTestAfterSuccess = TPA.ContinueTestAfterSuccess;
+                        ContinousToken = TPA.ContinousToken;
+                        ShouldEndWith = TPA.ShouldEndWith;
                     }
 
                     regexes.Add(_ThisTokenType, Regex);
@@ -118,6 +131,8 @@ namespace ParticleLexer
                     words.Add(_ThisTokenType, RegexPattern);
                     ShouldBeginingWithList.Add(_ThisTokenType, ShouldBeginWith);
                     ContinueAfterSuccessList.Add(_ThisTokenType, ContinueTestAfterSuccess);
+                    ContinousTokenList.Add(_ThisTokenType, ContinousToken);
+                    ShouldEndWithList.Add(_ThisTokenType, ShouldEndWith);
                 }
             }
         }

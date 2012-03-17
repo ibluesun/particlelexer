@@ -53,13 +53,33 @@ namespace ParticleLexerViewer
                 );
 
 
-            //ViewParseTree(Tokens);
             if (ParseTreeView.ItemsSource == null)
             {
                 ParseTreeView.Items.Clear();
              
             }
             ParseTreeView.ItemsSource = Tokens;
+        }
+
+        private void XmlParseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Tokens = Token.ParseText(XmlTextBox.Text);
+
+            Tokens = Tokens.MergeTokens<MultipleSpaceToken>();
+            Tokens = Tokens.MergeTokens<WordToken>();
+            Tokens = Tokens.RemoveSpaceTokens();
+            Tokens = Tokens.MergeTokens<XmlTagToken>();
+            
+            //Tokens = Tokens.MergeTokensInGroups(new XmlGroupToken());
+
+
+            if (ParseTreeView.ItemsSource == null)
+            {
+                ParseTreeView.Items.Clear();
+
+            }
+            ParseTreeView.ItemsSource = Tokens;
+
         }
 
     }
