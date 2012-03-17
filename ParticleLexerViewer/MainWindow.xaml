@@ -4,17 +4,32 @@
         Title="MainWindow" Height="350" Width="525">
  
     
-        <DockPanel  Name="dockPanel1"   >
-        <TextBox Height="70" Name="SourceTextBox"  AcceptsReturn="True" DockPanel.Dock="Top"   >Call[*Person(Ahmed Sadek)  Person(Aya Sadek)*]</TextBox>
-        <Button Content="Parse" Height="40" Name="ParseButton" Click="ParseButton_Click" DockPanel.Dock="Top" />
-            <TreeView Name="ParseTreeView" >
-                <!-- Item template that will render depend on ItemsSource-->
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding ChildTokens}">
-                        <TextBlock Text="{Binding DebugView}"></TextBlock>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-        </DockPanel>
-    
+
+    <DockPanel LastChildFill="True">
+    <TabControl DockPanel.Dock="Top" >
+        <TabItem Header="Custom Call" Name="tabItem1">
+            <DockPanel   >
+                <TextBox Height="70" Name="SourceTextBox"  AcceptsReturn="True" DockPanel.Dock="Top"   >Call[*Person(Ahmed Sadek)  Person(Aya Sadek)*]</TextBox>
+                <Button Content="Parse" Height="40" Name="ParseButton" Click="ParseButton_Click" DockPanel.Dock="Top" />
+
+            </DockPanel>
+
+        </TabItem>
+        
+        <TabItem Header="Xml">
+            <DockPanel   >
+                 <TextBox  Name="XmlTextBox"  AcceptsReturn="True" Height="50" DockPanel.Dock="Top"  >&lt;Hello>Welcome to the worlds of xml&lt;/Hello></TextBox>
+               <Button Content="Parse" Height="40" Name="XmlParseButton" Click="XmlParseButton_Click"  />
+            </DockPanel>
+        </TabItem>
+    </TabControl>
+        <TreeView Name="ParseTreeView"  >
+            <!-- Item template that will render depend on ItemsSource-->
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding ChildTokens}">
+                    <TextBlock Text="{Binding DebugView}"></TextBlock>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </DockPanel>
 </Window>

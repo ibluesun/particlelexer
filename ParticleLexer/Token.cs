@@ -9,6 +9,7 @@ using System.Globalization;
 #if NET35
 #else
 using System.Diagnostics.Contracts;
+using System.Text;
 #endif
 
 namespace ParticleLexer
@@ -101,10 +102,7 @@ namespace ParticleLexer
             childTokens.Add(token);
         }
 
-        public void AppendToken(Token token)
-        {
-            ParentToken.AppendSubToken(token);
-        }
+
 
 
         /// <summary>
@@ -136,6 +134,9 @@ namespace ParticleLexer
         public Token ParentToken { get; set; }
 
 
+        private string _TokenValue = null;
+        private int _previousChildrenTokenCount;
+
         /// <summary>
         /// Token Total String Value
         /// </summary>
@@ -143,19 +144,26 @@ namespace ParticleLexer
         {
             get
             {
-                if (childTokens.Count > 0)
+                if (_TokenValue == null || _previousChildrenTokenCount != childTokens.Count)
                 {
-                    string total = string.Empty;
-                    foreach (Token t in childTokens)
+                    if (childTokens.Count > 0)
                     {
-                        total += t.TokenValue;
+                        StringBuilder total = new StringBuilder();
+
+                        foreach (Token t in childTokens)
+                        {
+                            total.Append( t.TokenValue);
+                        }
+
+                        _TokenValue = total.ToString();
+                        _previousChildrenTokenCount = childTokens.Count;
                     }
-                    return total;
+                    else
+                    {
+                        _TokenValue = Value;
+                    }
                 }
-                else
-                {
-                    return Value;
-                }
+                return _TokenValue;
             }
         }
 
@@ -379,6 +387,7 @@ namespace ParticleLexer
 
         }
 
+
         /// <summary>
         /// Merge Single Tokens into one token guided by regular expression.        
         /// </summary>
@@ -412,8 +421,18 @@ namespace ParticleLexer
                     //
                     //   The behavior above now is modified when marked the token class as ExactWord
 
-                    if (!string.IsNullOrEmpty(merged.TokenValue) && tokenClassType.Type != typeof(WordToken) )
-                    {                   
+                    #region Failed in match
+
+                    if (!string.IsNullOrEmpty(merged.TokenValue) && tokenClassType.ContinousToken != true)
+                    {
+                        // don't continue if the target token doesn't start with the required text
+                        if (!string.IsNullOrEmpty(tokenClassType.ShouldBeginWith))
+                        {
+                            if (!merged.TokenValue.StartsWith(tokenClassType.ShouldBeginWith, StringComparison.OrdinalIgnoreCase)) goto NoStartWith;
+                        }
+
+
+
                         // inner sneaky loop. :)
                         int rtokIndex = tokIndex;
                         string AccumulatedInnerText = merged.TokenValue;
@@ -435,21 +454,26 @@ namespace ParticleLexer
                                     // no need to compare extra charachters ... so BREAAAAAAAAAAK
                                     goto WhileBreak;
                                 }
-                                
+
                                 // second check: check letter by letter that they are identical
                                 for (int iai = 0; iai < AccumulatedInnerText.Length; iai++)
                                     if (AccumulatedInnerText[iai] != tokenClassType.OriginalPatternWord[iai]) goto WhileBreak;
                             }
-                            else
+                            else if (!string.IsNullOrEmpty(tokenClassType.ShouldBeginWith))
                             {
                                 // pattern is not word token however we can test if the consumed charachters are in the pattern
-                                if (!string.IsNullOrEmpty(tokenClassType.ShouldBeginWith))
-                                {
-                                    // test that the accumulated text begins with the token beginwith value.
-                                    // otherwise no need to make other accumulation.
-                                    if (!AccumulatedInnerText.StartsWith(tokenClassType.ShouldBeginWith, StringComparison.OrdinalIgnoreCase)) goto WhileBreak;
-                                }
+                                // test that the accumulated text begins with the token beginwith value.
+                                // otherwise no need to make other accumulation.
+
+                                if (!AccumulatedInnerText.StartsWith(tokenClassType.ShouldBeginWith, StringComparison.OrdinalIgnoreCase)) goto WhileBreak;
                             }
+                            
+                            
+                            // terminate on specific conditions
+
+                            // reaching new line:  if you reach new line then most probably we don't need to check more for that token
+                            //if (AccumulatedInnerText.EndsWith(Environment.NewLine)) goto WhileBreak;
+
 
                             // go with comparing.
                             if (rx.IsMatch(AccumulatedInnerText))
@@ -481,13 +505,31 @@ namespace ParticleLexer
                                     goto loopTail;
                                 }
                             }
+
+                            
+                            if (!string.IsNullOrEmpty(tokenClassType.ShouldEndWith))
+                            {
+                                // Why we break here ??
+                                //   because the accumulated text is greedy and try to find a completion for the token that we are comparing with
+                                //   Accumulated text is grabbing the next token string and compare with the tokenclasstype 
+                                //   when compare success in the above code regex match then every thing is ok
+                                //    however if match didn't occur we will continue consumeing tokens until the end of the tokens
+                                //   to prevent this we will chech for the ending of the accumulated text
+                                //    if we found the ending resemble the end string of target token class then we will assume that we don't have matching token suitable and 
+                                //    we will end the loop to prevent unnecessary loops
+                                if (AccumulatedInnerText.EndsWith(tokenClassType.ShouldEndWith, StringComparison.OrdinalIgnoreCase)) goto WhileBreak;
+                            }
+
                             rtokIndex++;
                         }
 
                     WhileBreak: ;
-                        
+
                     }
 
+                    #endregion
+
+                NoStartWith: ;
 
                     // if merged token is not null put the merged value 
                     //  continue to test the last token with next tokens to the same regex
@@ -620,7 +662,12 @@ namespace ParticleLexer
 
         private static Dictionary<Type, TokenClass> CachedTokenClasses = new Dictionary<Type, TokenClass>();
 
-        public TokenClass GetTokenClass(Type tokenClassType)
+        /// <summary>
+        /// Gets <see cref="TokenClass"/> instance from cache if available.
+        /// </summary>
+        /// <param name="tokenClassType"></param>
+        /// <returns></returns>
+        private TokenClass GetTokenClass(Type tokenClassType)
         {
             TokenClass instance;
             CachedTokenClasses.TryGetValue(tokenClassType, out instance);
@@ -907,7 +954,85 @@ namespace ParticleLexer
 
             return first;
         }
-        
+
+        /// <summary>
+        /// Returns the value of tokens starting from specific token.
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <returns></returns>
+        public string SubTokensValue(int startIndex)
+        {
+            int idx = startIndex;
+            string total = string.Empty;
+            while (idx < this.Count)
+            {
+                total += this[idx].TokenValue;
+                idx++;
+            }
+            return total;
+
+        }
+
+        /// <summary>
+        /// Get inner tokens from leftIndex to the rightIndex 
+        /// --->   tokens &lt; -- 
+        /// </summary>
+        /// <param name="leftIndex"></param>
+        /// <param name="rightIndex"></param>
+        /// <returns>Return new token with sub tokens trimmed</returns>
+        public Token TrimTokens(int leftIndex, int rightIndex)
+        {
+            int count = this.Count;
+
+
+            Token rtk = new Token();
+            for (int b = leftIndex; b < count - rightIndex; b++)
+            {
+                rtk.AppendSubToken(this[b]);
+            }
+
+            return rtk;
+
+        }
+
+
+        /// <summary>
+        /// Extend Tokens from Left and Right and Fuse them into one Token with specific token class
+        /// </summary>
+        /// <param name="leftText"></param>
+        /// <param name="rightText"></param>
+        /// <returns>Return token with sub tokens extended and fused</returns>
+        public Token FuseTokens<FusedTokenClass>(string leftText, string rightText)
+            where FusedTokenClass : TokenClass
+        {
+            int count = this.Count;
+
+            Token rtk = new Token();
+
+            foreach (var t in Token.ParseText(leftText))
+            {
+                rtk.AppendSubToken(t);
+            }
+
+            for (int b = 0; b < count; b++)
+            {
+                rtk.AppendSubToken(this[b]);
+            }
+            foreach (var t in Token.ParseText(rightText))
+            {
+                rtk.AppendSubToken(t);
+            }
+
+            rtk.TokenClassType = typeof(FusedTokenClass);
+
+            Token tk = new Token();
+            tk.AppendSubToken(rtk);
+
+            return tk;
+        }
+
+
+
         #endregion
 
         #region Helper Functions
