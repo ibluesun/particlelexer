@@ -117,7 +117,7 @@ namespace ParticleLexer
 
                     if (TPA != null)
                     {
-                        Regex = new Regex("^" + TPA.RegexPattern + "$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        Regex = new Regex("^" + TPA.RegexPattern + "$", RegexOptions.IgnoreCase);
                         ExactWord = TPA.ExactWord;
                         RegexPattern = TPA.RegexPattern;
                         ShouldBeginWith = TPA.ShouldBeginWith;

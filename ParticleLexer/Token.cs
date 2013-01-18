@@ -10,6 +10,7 @@ using System.Globalization;
 #else
 using System.Diagnostics.Contracts;
 using System.Text;
+using ParticleLexer.CommonTokens;
 #endif
 
 namespace ParticleLexer
@@ -781,6 +782,7 @@ namespace ParticleLexer
             return Zabbat(current);
         }
 
+
         /// <summary>
         /// This function make sure that inner tokens are not the same as outer tokens by popping out the
         /// buried tokens to the surface.
@@ -1030,6 +1032,69 @@ namespace ParticleLexer
 
             return tk;
         }
+
+
+        /// <summary>
+        /// Parse text between " Double Qoutation marks and escape it \" with back slash \" "
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public Token TokenizeTextStrings()
+        {
+
+            var tokens = this;
+
+            // merge \" to be one charachter after this
+
+            tokens = tokens.MergeTokens<QuotationMarkEscapeToken>();
+
+            Token root = new Token();
+
+            Token runner = root;
+
+            //add every token until you encounter '
+
+
+            int ix = 0;
+            bool TextMode = false;
+            while (ix < tokens.Count)
+            {
+                if (tokens[ix].TokenClassType == typeof(QuotationMarkToken))
+                {
+                    TextMode = !TextMode;
+
+                    if (TextMode)
+                    {
+                        //true create the token
+                        runner = new Token();
+                        runner.TokenClassType = typeof(TextStringToken);
+                        root.AppendSubToken(runner);
+
+                        runner.AppendSubToken(tokens[ix]);
+
+                    }
+                    else
+                    {
+                        //false: return to root tokens
+                        runner.AppendSubToken(tokens[ix]);
+
+                        runner = root;
+                    }
+                }
+                else
+                {
+                    runner.AppendSubToken(tokens[ix]);
+                }
+
+
+                ix++;
+
+            }
+
+
+            return root;
+        }
+
 
 
 
