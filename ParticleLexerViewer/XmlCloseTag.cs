@@ -7,7 +7,12 @@ using ParticleLexer;
 
 namespace ParticleLexerViewer
 {
-    [TokenPattern(RegexPattern = @"</.+>", ShouldBeginWith = "<", ShouldEndWith = ">")]
+    [TokenPattern(RegexPattern = @"</", ExactWord = true)]
+    public class XmlCloseTagFirstSymbol : TokenClass { }
+
+    [TokenPattern(RegexPattern = @"/>", ExactWord = true)]
+    public class XmlCloseTagEndSymbol : TokenClass { }
+
     public class XmlCloseTag : TokenClass
     {
     }

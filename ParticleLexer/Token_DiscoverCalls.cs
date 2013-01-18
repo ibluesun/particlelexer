@@ -10,6 +10,89 @@ namespace ParticleLexer
 {
     public sealed partial class Token : IEnumerable<Token>
     {
+        
+        /// <summary>
+        /// Merge between known start token and different closing tokens with different merged tokens classes
+        /// </summary>
+        /// <param name="startTokenClass">the start token type</param>
+        /// <param name="closeTokenClasses">array of closing tokens</param>
+        /// <param name="mergedTokenClasses">array of types of extracted token classes corresponds to closing tokens</param>
+        /// <returns></returns>
+        public Token MergeTokensBetween(Type startTokenClass, Type[] closeTokenClasses, Type[] mergedTokenClasses) 
+        {
+            if (closeTokenClasses.Length != mergedTokenClasses.Length) throw new ArgumentException("Number of closing and merged token classes should be equal");
+
+            Token first = new Token();
+            Token current = first;
+
+            int ci = 0;
+
+            bool InComplete = false;
+
+            while (ci < childTokens.Count)
+            {
+                var c = childTokens[ci];
+                if (c.TokenClassType == startTokenClass)
+                {
+                    if (InComplete)
+                    {
+                        // we didn't encounter ending token   so we put the current tokens into its parents
+                        var p = current.ParentToken;
+                        foreach (var t in current) p.AppendSubToken(t);
+                        current = p;
+                        InComplete = false;
+                    }
+
+                    current = current.AppendSubToken();
+
+                    // current now is a new container token
+
+                    // put the open token in the container.
+                    current.AppendSubToken(c);
+
+                    InComplete = true;
+                    goto LoopAgain;
+                }
+
+                if (closeTokenClasses.Contains(c.TokenClassType) && InComplete == true)
+                {
+                    //put the close token inside the current container
+                    current.AppendSubToken(c);
+                    int ix = 0;
+                    for (; ix < closeTokenClasses.Length; ix++)
+                    {
+                        if (closeTokenClasses[ix] == c.TokenClassType)
+                        {
+                            // mark the current container with the group class type.
+                            current.TokenClassType = mergedTokenClasses[ix];
+                            break;
+                        }
+                    }
+
+                    current = current.ParentToken;
+
+                    InComplete = false;
+
+                    goto LoopAgain;
+                }
+                //not open nor close.
+                current.AppendSubToken(c);
+
+            LoopAgain:
+                ci++;
+            }
+
+            if (InComplete)
+            {
+                // we didn't encounter ending token   so we put the current tokens into its parents
+                var p = current.ParentToken;
+                foreach (var t in current) p.AppendSubToken(t);
+                current = null;
+            }
+
+            return Zabbat(first);
+        }
+
 
         /// <summary>
         /// Assemble single tokens into groups like open and close parenthesis 

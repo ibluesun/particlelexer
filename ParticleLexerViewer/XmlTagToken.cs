@@ -6,8 +6,14 @@ using ParticleLexer;
 
 namespace ParticleLexerViewer
 {
-    [TokenPattern(RegexPattern = @"<.+>", ShouldBeginWith = "<", ShouldEndWith = ">")]
-    class XmlTagToken : TokenClass
+
+    [TokenPattern(RegexPattern = @"&lt;", ExactWord = true)]
+    class XmlLessThanToken : TokenClass { }
+
+    [TokenPattern(RegexPattern = @"&gt;", ExactWord = true)]
+    class XmlGreaterThanToken : TokenClass { }
+
+    class XmlCompleteTagToken : TokenClass
     {
     }
 }

@@ -1,28 +1,23 @@
 ﻿<Window x:Class="ParticleLexerViewer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
- 
-    
+        Title="MainWindow" Height="600" Width="525">
 
     <DockPanel LastChildFill="True">
-    <TabControl DockPanel.Dock="Top" >
-        <TabItem Header="Custom Call" Name="tabItem1">
-            <DockPanel   >
-                <TextBox Height="70" Name="SourceTextBox"  AcceptsReturn="True" DockPanel.Dock="Top"   >Call[*Person(Ahmed Sadek)  Person(Aya Sadek)*]</TextBox>
-                <Button Content="Parse" Height="40" Name="ParseButton" Click="ParseButton_Click" DockPanel.Dock="Top" />
-
-            </DockPanel>
-
-        </TabItem>
-        
-        <TabItem Header="Xml">
-            <DockPanel   >
-                 <TextBox  Name="XmlTextBox"  AcceptsReturn="True" Height="50" DockPanel.Dock="Top"  >&lt;Hello>Welcome to the worlds of xml&lt;/Hello></TextBox>
-               <Button Content="Parse" Height="40" Name="XmlParseButton" Click="XmlParseButton_Click"  />
-            </DockPanel>
-        </TabItem>
-    </TabControl>
+        <TabControl DockPanel.Dock="Top" >
+            <TabItem Header="Custom Call" Name="tabItem1">
+                <DockPanel   >
+                    <TextBox Height="170" Name="SourceTextBox"  AcceptsReturn="True" DockPanel.Dock="Top"   >Call[*Person(Ahmed Sadek)  Person(Aya Sadek)*]</TextBox>
+                    <Button Content="Parse" Height="40" Name="ParseButton" Click="ParseButton_Click" DockPanel.Dock="Top" />
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Xml">
+                <DockPanel   >
+                    <TextBox  Name="XmlTextBox"  AcceptsReturn="True" Height="170" DockPanel.Dock="Top"  >dummy text &lt;Beep duration=1000 /> &lt;Hello>Welcome to the worlds of xml&lt;/Hello></TextBox>
+                    <Button Content="Parse" Height="40" Name="XmlParseButton" Click="XmlParseButton_Click"  />
+                </DockPanel>
+            </TabItem>
+        </TabControl>
         <TreeView Name="ParseTreeView"  >
             <!-- Item template that will render depend on ItemsSource-->
             <TreeView.ItemTemplate>
