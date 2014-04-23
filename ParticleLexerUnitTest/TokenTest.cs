@@ -3,6 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
 using ParticleLexer.StandardTokens;
+using System.IO;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ParticleLexerUnitTest
 {
@@ -169,6 +172,73 @@ namespace ParticleLexerUnitTest
 
 
 
+        }
+
+
+        [TestMethod]
+        public void MergeRepitiveTest()
+        {
+            Token l = Token.ParseText(" Hello Ahmed Sadek    and how are you today??");
+            l = l.MergeRepitiveTokens<MultipleSpaceToken, SingleSpaceToken>();
+
+            Assert.AreEqual(l[0].TokenClassType, typeof(MultipleSpaceToken));
+        }
+
+        [TestMethod()]
+        public void MergeSequencePerformance()
+        {
+            var rr = Directory.GetCurrentDirectory();
+
+            List<Token> Method_One = new List<Token>();
+            List<Token> Method_Two = new List<Token>();
+            using (var sr = new StreamReader(@"..\..\..\ParticleLexerUnitTest\Quran.txt"))
+            {
+                int o = Environment.TickCount;
+                while (!sr.EndOfStream)
+                {
+                    string gl = sr.ReadLine();
+
+                    Token k = Token.ParseText(gl);
+
+                    k = k.MergeTokens<MultipleSpaceToken>();
+                    Method_One.Add(k);
+                }
+
+                int elapsed = Environment.TickCount - o;
+
+            }
+
+
+            using (var sr = new StreamReader(@"..\..\..\ParticleLexerUnitTest\Quran.txt"))
+            {
+                int o = Environment.TickCount;
+                while (!sr.EndOfStream)
+                {
+                    string gl = sr.ReadLine();
+
+                    Token k = Token.ParseText(gl);
+
+                    k = k.MergeRepitiveTokens<MultipleSpaceToken, SingleSpaceToken>();
+                    Method_Two.Add(k);
+                }
+
+                int elapsed = Environment.TickCount - o;
+
+            }
+
+            Assert.AreEqual(Method_One.Count, Method_Two.Count);
+
+            for(int i=0;i < Method_One.Count; i++)
+            {
+                var m1 = Method_One[i];
+                var m2 = Method_Two[i];
+
+                if (m1.Count !=m2.Count)
+                {
+                    Debug.WriteLine(m1.TokenValue);
+                }
+                Assert.AreEqual(Method_One[i].Count, Method_Two[i].Count);
+            }
         }
     }
 }

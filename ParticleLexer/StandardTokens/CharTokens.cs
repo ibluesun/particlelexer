@@ -191,6 +191,21 @@ namespace ParticleLexer.StandardTokens
     {
     }
 
+    [TokenPattern(RegexPattern = @"\t", ExactWord = true)]
+    public class TabToken : TokenClass
+    {
+    }
+
+    [TokenPattern(RegexPattern = @"\r", ExactWord = true)]
+    public class CarriageReturnToken : TokenClass
+    {
+    }
+
+    [TokenPattern(RegexPattern = @"\n", ExactWord = true)]
+    public class LineFeedToken : TokenClass
+    {
+    }
+    
 
 
 }
@@ -248,6 +263,9 @@ namespace ParticleLexer
                 case '?': return typeof(QuestionMarkToken);
 
                 case ' ': return typeof(SingleSpaceToken);
+
+                case '\r': return typeof(CarriageReturnToken);
+                case '\n': return typeof(LineFeedToken);
 
 
                 default:

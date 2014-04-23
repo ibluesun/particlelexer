@@ -55,6 +55,7 @@
     <Compile Include="StandardTokens\CallTokens.cs" />
     <Compile Include="StandardTokens\LogicalTokens.cs" />
     <Compile Include="StandardTokens\GroupsTokens.cs" />
+    <Compile Include="StandardTokens\MergedToken.cs" />
     <Compile Include="StandardTokens\NumberToken.cs" />
     <Compile Include="StandardTokens\WordTokens.cs" />
     <Compile Include="Token.cs" />
