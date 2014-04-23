@@ -291,6 +291,7 @@ namespace ParticleLexer
 
 
 
+
         /// <summary>
         /// Merge all tokens into the one and exclude specific token
         /// </summary>
@@ -313,6 +314,73 @@ namespace ParticleLexer
         {
             return MergeAllBut(0, typeof(MergedTokenClass), tokenClasses);
         }
+
+
+        /// <summary>
+        /// Optimized function to merge all tokens but spaces tokens
+        /// </summary>
+        /// <typeparam name="MergedTokenClass"></typeparam>
+        /// <param name="startIndex"></param>
+        /// <returns></returns>
+        public Token MergeAllButSpaces<MergedTokenClass>(int startIndex = 0)
+        {
+            Token first = this;
+
+            Token current = new Token();
+
+            // walk on all tokens and accumulate them unitl you encounter separator
+
+            int ci = 0;
+
+            Token mergedTokens = new Token();
+
+            while (ci < first.Count)
+            {
+
+                var c = first[ci];
+
+                if (ci < startIndex)
+                {
+                    current.AppendSubToken(c);
+                }
+                else
+                {
+                    if (c.TokenClassType == typeof (SingleSpaceToken)|| c.TokenClassType == typeof(MultipleSpaceToken))    
+                    {
+                        //found a separator
+                        if (mergedTokens.Count > 0)
+                        {
+                            mergedTokens.TokenClassType = typeof(MergedTokenClass);
+
+                            current.AppendSubToken(mergedTokens);
+                        }
+                        current.AppendSubToken(c);
+
+                        mergedTokens = new Token();
+                    }
+                    else
+                    {
+                        mergedTokens.AppendSubToken(c);
+                    }
+                }
+
+                ci++;
+            }
+
+            if (mergedTokens.Count > 0)
+            {
+                //the rest of merged tokens
+                mergedTokens.TokenClassType = typeof(MergedTokenClass);
+
+                current.AppendSubToken(mergedTokens);
+            }
+
+            current.TokenClassType = first.TokenClassType;
+
+            return Zabbat(current);
+
+        }
+
 
         /// <summary>
         /// Merge all tokens into the one Token with specific TokenClass and exclude specific token classes.
@@ -405,7 +473,12 @@ namespace ParticleLexer
             loopHead:
                 Token tok = childTokens[tokIndex];
 
-                if (rx.Match(merged.TokenValue + tok.TokenValue).Success)
+                bool Matched = false;
+                
+                Matched = rx.Match(merged.TokenValue + tok.TokenValue).Success;
+                
+                
+                if (Matched)
                 {
                     //continue merge until merged value fail then last merged value is the desired value.
                     merged.AppendSubToken(tok);
@@ -536,7 +609,11 @@ namespace ParticleLexer
                     //  continue to test the last token with next tokens to the same regex
                     if (!string.IsNullOrEmpty(merged.TokenValue))
                     {
-                        if (rx.IsMatch(merged.TokenValue)) merged.TokenClassType = tokenClassType.Type;
+                        if (rx.IsMatch(merged.TokenValue))
+                        {
+                            merged.TokenClassType = tokenClassType.Type;
+                        }
+
                         current.AppendSubToken(merged);
                         merged = new Token();
 
@@ -702,6 +779,43 @@ namespace ParticleLexer
             return MergeTokens(GetTokenClass<DesiredTokenClass>());
         }
 
+        /// <summary>
+        /// Merge the repeated token into Merged Token
+        /// </summary>
+        /// <typeparam name="MergedToken"></typeparam>
+        /// <param name="RepeatedToken"></param>
+        /// <returns></returns>
+        public Token MergeRepitiveTokens<MergedToken, RepeatedToken>()
+        {
+            Token current = new Token();
+
+            Token merged = new Token() { TokenClassType = typeof(MergedToken) };
+
+            int tokIndex = 0;
+            while (tokIndex < childTokens.Count)
+            {
+                if (childTokens[tokIndex].TokenClassType == typeof(RepeatedToken))
+                {
+                    merged.AppendSubToken(childTokens[tokIndex]);
+                }
+                else
+                {
+
+                    if (merged.Count > 0)
+                    {
+                        current.AppendSubToken(merged);
+                        merged = new Token() { TokenClassType = typeof(MergedToken) };
+                    }
+
+                    // add the current index.
+                    current.AppendSubToken(childTokens[tokIndex]);
+                }
+
+                tokIndex++;
+            }
+
+            return Zabbat(current);
+        }
 
         /// <summary>
         /// Merge a set of known sequence of tokens into a single with specific token class type.
@@ -956,6 +1070,72 @@ namespace ParticleLexer
 
             return first;
         }
+
+        /// <summary>
+        /// Search for any space token and remove it
+        /// </summary>
+        /// <returns></returns>
+        public Token RemoveAnySpaceTokens()
+        {
+            Token first = new Token();
+            Token current = first;
+
+            int ci = 0;
+            while (ci < childTokens.Count)
+            {
+                var tok = childTokens[ci];
+
+                //make sure all chars in value are white spaces
+
+                
+                if (tok.TokenClassType == typeof(MultipleSpaceToken) || tok.TokenClassType == typeof(SingleSpaceToken))
+                {
+                    //all string are white spaces
+                }
+                else
+                {
+                    current.AppendSubToken(tok);
+                }
+
+                ci++;
+            }
+
+            return first;
+        }
+
+        /// <summary>
+        /// Removes New Lines Tokens
+        /// </summary>
+        /// <returns></returns>
+        public Token RemoveNewLineTokens()
+        {
+            Token first = new Token();
+            Token current = first;
+
+            int ci = 0;
+            while (ci < childTokens.Count)
+            {
+                var tok = childTokens[ci];
+
+                //make sure all chars in value are white spaces
+
+
+                if (tok.TokenClassType == typeof(CarriageReturnToken) || tok.TokenClassType == typeof(LineFeedToken))
+                {
+                    //all string are white spaces
+                }
+                else
+                {
+                    current.AppendSubToken(tok);
+                }
+
+                ci++;
+            }
+
+            return first;
+        }
+
+
 
         /// <summary>
         /// Returns the value of tokens starting from specific token.
