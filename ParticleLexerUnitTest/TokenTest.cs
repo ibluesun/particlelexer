@@ -176,10 +176,10 @@ namespace ParticleLexerUnitTest
 
 
         [TestMethod]
-        public void MergeRepitiveTest()
+        public void MergeRepetitiveTest()
         {
             Token l = Token.ParseText(" Hello Ahmed Sadek    and how are you today??");
-            l = l.MergeRepitiveTokens<MultipleSpaceToken, SingleSpaceToken>();
+            l = l.MergeRepetitiveTokens<MultipleSpaceToken, SingleSpaceToken>();
 
             Assert.AreEqual(l[0].TokenClassType, typeof(MultipleSpaceToken));
         }
@@ -218,7 +218,7 @@ namespace ParticleLexerUnitTest
 
                     Token k = Token.ParseText(gl);
 
-                    k = k.MergeRepitiveTokens<MultipleSpaceToken, SingleSpaceToken>();
+                    k = k.MergeRepetitiveTokens<MultipleSpaceToken, SingleSpaceToken>();
                     Method_Two.Add(k);
                 }
 

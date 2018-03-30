@@ -79,6 +79,8 @@ namespace ParticleLexer
             }
         }
 
+
+
         public Token AppendSubToken()
         {
             return AppendSubToken(string.Empty);
@@ -103,6 +105,12 @@ namespace ParticleLexer
             childTokens.Add(token);
         }
 
+
+        public void InsertSubToken(int index, Token token)
+        {
+            token.ParentToken = this;
+            childTokens.Insert(index, token);
+        }
 
 
 
@@ -785,7 +793,7 @@ namespace ParticleLexer
         /// <typeparam name="MergedToken"></typeparam>
         /// <param name="RepeatedToken"></param>
         /// <returns></returns>
-        public Token MergeRepitiveTokens<MergedToken, RepeatedToken>()
+        public Token MergeRepetitiveTokens<MergedToken, RepeatedToken>()
         {
             Token current = new Token();
 
